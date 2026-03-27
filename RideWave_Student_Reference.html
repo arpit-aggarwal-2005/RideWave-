@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RideWave — Student Reference Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #07090e;
+  --surface: #0d1117;
+  --card:    #161d2b;
+  --border:  #2d3748;
+  --accent:  #60cdff;
+  --orange:  #fdba74;
+  --green:   #6ee7b7;
+  --purple:  #d8b4fe;
+  --yellow:  #fde68a;
+  --red:     #fca5a5;
+  --text:    #f8fafc;
+  --muted:   #e2e8f0;
+  --display: 'Syne', sans-serif;
+  --body:    'Lato', sans-serif;
+  --mono:    'JetBrains Mono', monospace;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--body);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── NOISE OVERLAY ── */
+body::before {
+  content:'';
+  position:fixed; inset:0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events:none; z-index:0;
+}
+
+/* ── TOP BAR ── */
+.topbar {
+  position: sticky; top:0; z-index:100;
+  background: rgba(8,12,18,0.92);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 0 32px;
+  height: 56px;
+}
+
+.logo {
+  font-family: var(--display);
+  font-size: 18px;
+  font-weight: 800;
+  color: #e2e8f0;
+  letter-spacing: -0.5px;
+  margin-right: 32px;
+  white-space: nowrap;
+}
+
+.logo span { color: #fde68a; }
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+  overflow-x: auto;
+}
+
+.tab {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  padding: 6px 16px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  color: var(--muted);
+  background: transparent;
+  white-space: nowrap;
+  transition: all 0.2s;
+  user-select: none;
+}
+
+.tab:hover { color: var(--text); border-color: var(--border); }
+
+.tab.active {
+  color: var(--bg);
+  background: var(--accent);
+  border-color: #e2e8f0;
+  font-weight: 700;
+}
+
+.badge {
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 3px 10px;
+  border-radius: 100px;
+  background: rgba(0,194,255,0.1);
+  color: #e2e8f0;
+  border: 1px solid rgba(0,194,255,0.2);
+  white-space: nowrap;
+  margin-left: auto;
+}
+
+/* ── WRAPPER ── */
+.wrapper {
+  position: relative; z-index: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+}
+
+/* ── SECTION ── */
+.section { display: none; }
+.section.active { display: block; animation: fadeIn 0.3s ease; }
+
+@keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+
+/* ── SECTION HEADER ── */
+.sec-header {
+  margin-bottom: 36px;
+}
+.sec-tag {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #e2e8f0;
+  margin-bottom: 10px;
+  display: block;
+}
+.sec-title {
+  font-family: var(--display);
+  font-size: clamp(28px,4vw,44px);
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.1;
+  margin-bottom: 10px;
+}
+.sec-sub {
+  color: #cbd5e1;
+  font-size: 15px;
+  line-height: 1.7;
+  max-width: 600px;
+}
+
+/* ══════════════════════════════════════════
+   SECTION 1 — THE STORY
+══════════════════════════════════════════ */
+.story-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 16px;
+}
+
+.story-card {
+  background: #161d2b;
+  border: 1px solid #2d3748;
+  border-radius: 14px;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s, border-color 0.2s;
+}
+
+.story-card:hover { transform: translateY(-3px); }
+
+.story-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--card-accent, var(--accent));
+}
+
+.story-num {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 12px;
+  display: block;
+}
+
+.story-problem {
+  font-family: var(--display);
+  font-size: 15px;
+  font-weight: 700;
+  color: #fde68a;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  line-height: 1.4;
+}
+
+.story-desc {
+  font-size: 14px;
+  color: #cbd5e1;
+  line-height: 1.7;
+  margin-bottom: 16px;
+}
+
+.story-solution {
+  background: rgba(0,0,0,0.3);
+  border-radius: 8px;
+  padding: 12px 14px;
+  border-left: 3px solid var(--card-accent, var(--accent));
+}
+
+.story-sol-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--card-accent, var(--accent));
+  margin-bottom: 6px;
+  display: block;
+}
+
+.story-sol-text {
+  font-size: 14px;
+  color: #f8fafc;
+  line-height: 1.6;
+  font-weight: 500;
+}  line-height: 1.5;
+  font-weight: 600;
+}
+
+.story-feature {
+  display: inline-block;
+  margin-top: 12px;
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 100px;
+  background: color-mix(in srgb, var(--card-accent, var(--accent)) 15%, transparent);
+  color: var(--card-accent, var(--accent));
+  border: 1px solid color-mix(in srgb, var(--card-accent, var(--accent)) 30%, transparent);
+}
+
+/* ══════════════════════════════════════════
+   SECTION 2 — PIPELINE MAP
+══════════════════════════════════════════ */
+.pipeline-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.pipeline-group {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  margin-bottom: 4px;
+}
+
+.pipeline-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  padding: 16px 8px;
+  min-width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid var(--border);
+  margin-right: 16px;
+}
+
+.pipeline-stages {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex: 1;
+  padding: 12px 0;
+  align-items: center;
+}
+
+.stage {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 18px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  min-width: 130px;
+}
+
+.stage:hover {
+  border-color: var(--stage-color, var(--accent));
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+
+.stage.done {
+  border-color: var(--green);
+  background: rgba(0,229,160,0.06);
+}
+
+.stage.done::after {
+  content: '✓';
+  position: absolute;
+  top: 6px; right: 8px;
+  font-size: 12px;
+  color: var(--green);
+  font-weight: 700;
+}
+
+.stage-icon { font-size: 20px; margin-bottom: 6px; display: block; }
+
+.stage-name {
+  font-family: var(--display);
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 3px;
+}
+
+.stage-tech {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--stage-color, var(--accent));
+}
+
+.stage-detail {
+  display: none;
+  margin-top: 8px;
+  font-size: 12px;
+  color: #cbd5e1;
+  line-height: 1.6;
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+}
+
+.stage.expanded .stage-detail { display: block; }
+
+.arrow {
+  color: var(--muted);
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+  flex-shrink: 0;
+}
+
+.pipeline-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 8px 0 8px 56px;
+}
+
+.progress-bar-wrap {
+  background: var(--surface);
+  border-radius: 100px;
+  height: 6px;
+  margin: 24px 0 8px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--green));
+  border-radius: 100px;
+  transition: width 0.5s ease;
+}
+
+.progress-label {
+  color: #e2e8f0 !important;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
+  text-align: right;
+}
+
+.complete-btn {
+  margin-top: 24px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn:hover { border-color: var(--accent); color: var(--accent); }
+.btn.primary { background: var(--accent); color: var(--bg); border-color: var(--accent); font-weight: 700; }
+
+/* ══════════════════════════════════════════
+   SECTION 3 — WHAT BREAKS
+══════════════════════════════════════════ */
+.breaks-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.breaks-table th {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #94a3b8;
+  text-align: left;
+  padding: 14px 16px;
+  border-bottom: 2px solid var(--border);
+  background: rgba(0,0,0,0.3);
+}
+
+.breaks-table td {
+  padding: 18px 16px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+.breaks-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+.feature-name {
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 700;
+  color: #7dd3fc;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.feature-layer {
+  font-size: 12px;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+.break-text {
+  font-size: 14px;
+  color: #fde68a;
+  line-height: 1.6;
+  font-weight: 600;
+}
+
+.why-text {
+  font-size: 13px;
+  color: #cbd5e1;
+  line-height: 1.6;
+  margin-top: 6px;
+}
+
+.sme-answer {
+  font-size: 13px;
+  color: #a7f3d0;
+  line-height: 1.6;
+  background: rgba(52,211,153,0.08);
+  border-radius: 8px;
+  padding: 10px 12px;
+  border-left: 3px solid var(--green);
+}
+
+/* ══════════════════════════════════════════
+   SECTION 4 — KEY COMMANDS
+══════════════════════════════════════════ */
+.commands-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(520px, 1fr));
+  gap: 16px;
+}
+
+.cmd-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.cmd-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(0,0,0,0.2);
+}
+
+.cmd-num {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.cmd-title {
+  font-family: var(--display);
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  flex: 1;
+}
+
+.cmd-layer {
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 100px;
+  background: rgba(0,194,255,0.1);
+  color: #e2e8f0;
+}
+
+.cmd-body { padding: 16px 18px; }
+
+.cmd-why {
+  font-size: 13px;
+  color: #e2e8f0;
+  line-height: 1.6;
+  margin-bottom: 12px;
+  padding-left: 12px;
+  border-left: 3px solid var(--border);
+}
+
+.cmd-code {
+  background: #060a10;
+  border-radius: 8px;
+  padding: 14px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: #e2e8f0;
+  line-height: 1.7;
+  overflow-x: auto;
+  white-space: pre;
+  border: 1px solid rgba(255,255,255,0.04);
+}
+
+.cmd-code .comment { color: #64748b; }
+.cmd-code .kw { color: #f9a8d4; }
+.cmd-code .str { color: #86efac; }
+.cmd-code .fn { color: #fde68a; }
+
+.cmd-remember {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #fde68a;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  line-height: 1.5;
+  background: rgba(253,230,138,0.06);
+  padding: 8px 10px;
+  border-radius: 6px;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .topbar { padding: 0 16px; }
+  .logo { font-size: 14px; margin-right: 16px; }
+  .commands-grid { grid-template-columns: 1fr; }
+  .story-grid { grid-template-columns: 1fr; }
+  .pipeline-label { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="logo">Ride<span>Wave</span></div>
+  <div class="tabs">
+    <div class="tab active" onclick="showSection('story', this)">📖 The Story</div>
+    <div class="tab" onclick="showSection('pipeline', this)">🗺️ Pipeline Map</div>
+    <div class="tab" onclick="showSection('breaks', this)">⚠️ What Breaks</div>
+    <div class="tab" onclick="showSection('commands', this)">💻 Key Commands</div>
+  </div>
+  <div class="badge">Sigmoid DE Bootcamp 2026</div>
+</div>
+
+<div class="wrapper">
+
+<!-- ══════════════════════════════════════════
+     SECTION 1 — THE STORY
+══════════════════════════════════════════ -->
+<div class="section active" id="section-story">
+  <div class="sec-header">
+    <span class="sec-tag">Why we built this pipeline</span>
+    <div class="sec-title">Every Feature Solved a Real Problem</div>
+    <div class="sec-sub">RideWave had real business problems. Each Databricks feature you are learning was the solution. Read this before each lab — then the code will make sense.</div>
+  </div>
+
+  <div class="story-grid">
+
+    <div class="story-card" style="--card-accent:#00c2ff">
+      <span class="story-num">PROBLEM 01 · DATA STORAGE</span>
+      <div class="story-problem">🗂️ All data in Excel and MySQL</div>
+      <div class="story-desc">RideWave's ops team could not answer "how many rides happened yesterday in Mumbai?" without exporting Excel sheets and counting manually. Data was scattered, stale, and unreliable.</div>
+      <div class="story-solution">
+        <span class="story-sol-label">Solution</span>
+        <div class="story-sol-text">We built a Data Lake on S3. All data lands here first. One place. Always available. Never deleted.</div>
+      </div>
+      <span class="story-feature">AWS S3 · Data Lake</span>
+    </div>
+
+    <div class="story-card" style="--card-accent:#ff6b35">
+      <span class="story-num">PROBLEM 02 · RAW DATA QUERIES</span>
+      <div class="story-problem">📊 Business needed answers NOW</div>
+      <div class="story-desc">The full ETL pipeline takes weeks to build. But management needed ride counts and revenue figures immediately. They could not wait for the pipeline to be ready.</div>
+      <div class="story-solution">
+        <span class="story-sol-label">Solution</span>
+        <div class="story-sol-text">Athena queries raw CSV files in S3 directly using SQL. No database needed. No loading. Answers in minutes on raw data.</div>
+      </div>
+      <span class="story-feature">AWS Athena · SQL on S3</span>
+    </div>
+
+    <div class="story-card" style="--card-accent:#a855f7">
+      <span class="story-num">PROBLEM 03 · DATA QUALITY</span>
+      <div class="story-problem">🐛 Nulls and wrong types in raw data</div>
+      <div class="story-desc">fare_amount was stored as text ("800.50") not a number. 25 rides had null fare_amount. ride_status had mixed case: "Completed", "COMPLETED", "completed" — all treated as different values.</div>
+      <div class="story-solution">
+        <span class="story-sol-label">Solution</span>
+        <div class="story-sol-text">Glue ETL and Silver layer applies cleaning rules: cast types, drop nulls, standardise case. data_profiler.py finds the problems first so we know what to fix.</div>
+      </div>
+      <span class="story-feature">Glue ETL · Silver MERGE</span>
+    </div>
+
+    <div class="story-card" style="--card-accent:#00e5a0">
+      <span class="story-num">PROBLEM 04 · AUDIT TRAIL</span>
+      <div class="story-problem">🔍 "Show me last week's data"</div>
+      <div class="story-desc">The finance team asked: "What did our revenue look like on March 15th?" But the pipeline was overwriting data every night. Yesterday's data was gone forever. No way to answer the question.</div>
+      <div class="story-solution">
+        <span class="story-sol-label">Solution</span>
+        <div class="story-sol-text">Bronze layer uses mode('append') NEVER overwrite. Every day's data is preserved. 4 metadata columns track WHEN and WHERE each record came from.</div>
+      </div>
+      <span class="story-feature">Bronze · Append-only · Metadata</span>
+    </div>
+
+    <div class="story-card" style="--card-accent:#fbbf24">
+      <span class="story-num">PROBLEM 05 · DUPLICATES</span>
+      <div class="story-problem">💥 Pipeline ran twice — revenue doubled</div>
+      <div class="story-desc">The pipeline crashed at 2 AM and auto-restarted. It reprocessed all records. Every order now appeared twice. Finance reported double revenue to investors. Stock price moved on wrong data.</div>
+      <div class="story-solution">
+        <span class="story-sol-label">Solution</span>
+        <div class="story-sol-text">Silver uses MERGE not overwrite. MERGE checks: if ride_id exists → update. If new → insert. Run it 10 times — same result. Zero duplicates. This is called idempotency.</div>
+      </div>
+      <span class="story-feature">Silver · MERGE · Idempotency</span>
+    </div>
+
+    <div class="story-card" style="--card-accent:#ef4444">
+      <span class="story-num">PROBLEM 06 · REAL-TIME DATA</span>
+      <div class="story-problem">⚡ Ops needed live ride counts</div>
+      <div class="story-desc">The operations team needed to see rides happening RIGHT NOW — not yesterday's batch. They needed to know if Mumbai had enough drivers at 8 PM peak hour. Nightly batch was 12 hours too late.</div>
+      <div class="story-solution">
+        <span class="story-sol-label">Solution</span>
+        <div class="story-sol-text">Kinesis captures ride events in real-time. Firehose delivers to S3 every 60 seconds. Auto Loader picks up new files instantly. Data is live within 2 minutes of a ride completing.</div>
+      </div>
+      <span class="story-feature">Kinesis · Firehose · Auto Loader</span>
+    </div>
+
+    <div class="story-card" style="--card-accent:#00c2ff">
+      <span class="story-num">PROBLEM 07 · FILE TRACKING</span>
+      <div class="story-problem">🔄 Auto Loader reprocessing old files</div>
+      <div class="story-desc">Every time the pipeline ran, Auto Loader read ALL files in S3 — including the ones already processed. Bronze grew 10x every day. Gold showed 10x revenue. All because old files were re-read.</div>
+      <div class="story-solution">
+        <span class="story-sol-label">Solution</span>
+        <div class="story-sol-text">Checkpoint is Auto Loader's memory. It saves which files were already processed to S3. Next run — skips old files, reads only new ones. Exactly-once guarantee.</div>
+      </div>
+      <span class="story-feature">Auto Loader · Checkpoint</span>
+    </div>
+
+    <div class="story-card" style="--card-accent:#ff6b35">
+      <span class="story-num">PROBLEM 08 · SLOW QUERIES</span>
+      <div class="story-problem">🐌 Dashboard took 45 minutes to load</div>
+      <div class="story-desc">After 3 months of streaming, S3 had 50,000 small files. Spark opened each file separately — 50,000 open operations. The Gold dashboard query took 45 minutes. Users stopped using it.</div>
+      <div class="story-solution">
+        <span class="story-sol-label">Solution</span>
+        <div class="story-sol-text">OPTIMIZE compacts 50,000 small files into 5 large files. ZORDER BY (city) clusters city data together. Same query now runs in 2 minutes. Dashboard is usable again.</div>
+      </div>
+      <span class="story-feature">OPTIMIZE · ZORDER · Small file fix</span>
+    </div>
+
+    <div class="story-card" style="--card-accent:#a855f7">
+      <span class="story-num">PROBLEM 09 · BAD PIPELINE RUN</span>
+      <div class="story-problem">😱 Wrong data written to Gold table</div>
+      <div class="story-desc">A bug in the Gold aggregation wrote incorrect city revenue figures. The dashboard showed Mumbai revenue as ₹0. By the time it was caught, the original correct data was overwritten and gone.</div>
+      <div class="story-solution">
+        <span class="story-sol-label">Solution</span>
+        <div class="story-sol-text">Delta Time Travel. Every write creates a version. RESTORE TABLE gold_city_revenue VERSION AS OF 3 — rolls back to before the bug in seconds. Data is never truly lost.</div>
+      </div>
+      <span class="story-feature">Delta Time Travel · Version History</span>
+    </div>
+
+    <div class="story-card" style="--card-accent:#00e5a0">
+      <span class="story-num">PROBLEM 10 · MANUAL PIPELINE</span>
+      <div class="story-problem">😴 Engineer runs pipeline at 6 AM daily</div>
+      <div class="story-desc">Someone had to wake up every morning at 6 AM to manually run Bronze → Silver → Gold notebooks. If they overslept or were sick — no data for the business that day. Not scalable.</div>
+      <div class="story-solution">
+        <span class="story-sol-label">Solution</span>
+        <div class="story-sol-text">Databricks Workflow. Bronze → Silver → Gold runs automatically every morning at 6 AM. If Bronze fails, Silver and Gold are skipped. Email alert sent. Engineer sleeps in.</div>
+      </div>
+      <span class="story-feature">Databricks Workflows · DAG · Schedule</span>
+    </div>
+
+    <div class="story-card" style="--card-accent:#fbbf24">
+      <span class="story-num">PROBLEM 11 · DATA ACCESS</span>
+      <div class="story-problem">🔓 Everyone could see customer phone numbers</div>
+      <div class="story-desc">An intern analyst queried the customer table and saw full phone numbers and credit card numbers for all customers. GDPR violation. Legal team panicked. Company fined ₹2 crore.</div>
+      <div class="story-solution">
+        <span class="story-sol-label">Solution</span>
+        <div class="story-sol-text">Unity Catalog column masking. Analysts see ****-****-****-1001. Finance team sees full numbers. Same table, different views, controlled by role. One policy covers all tools.</div>
+      </div>
+      <span class="story-feature">Unity Catalog · Column Masking · GDPR</span>
+    </div>
+
+    <div class="story-card" style="--card-accent:#ef4444">
+      <span class="story-num">PROBLEM 12 · BUSINESS ANSWERS</span>
+      <div class="story-problem">📈 "Which city earns most? When are peak hours?"</div>
+      <div class="story-desc">The CEO asked: "Which city should we expand to next?" The ops head asked: "When should we send surge pricing alerts?" Nobody could answer from raw data — it was too complex to query directly.</div>
+      <div class="story-solution">
+        <span class="story-sol-label">Solution</span>
+        <div class="story-sol-text">Gold layer. Pre-aggregated tables: gold_city_revenue, gold_driver_performance, gold_peak_hours. CEO opens dashboard — answers are there. No SQL needed. Updated every morning automatically.</div>
+      </div>
+      <span class="story-feature">Gold Layer · CTEs · Business Answers</span>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SECTION 2 — PIPELINE MAP
+══════════════════════════════════════════ -->
+<div class="section" id="section-pipeline">
+  <div class="sec-header">
+    <span class="sec-tag">Your complete pipeline</span>
+    <div class="sec-title">The RideWave Data Journey</div>
+    <div class="sec-sub">Click any stage to see what it does. Click again to mark as done. Track your progress as you build.</div>
+  </div>
+
+  <div class="progress-bar-wrap">
+    <div class="progress-bar" id="progressBar" style="width:0%"></div>
+  </div>
+  <div class="progress-label" id="progressLabel">0 of 14 stages complete</div>
+
+  <div class="complete-btn">
+    <button class="btn primary" onclick="resetAll()">Reset All</button>
+    <button class="btn" onclick="markAll()">Mark All Done</button>
+  </div>
+
+  <br>
+
+  <div class="pipeline-container">
+
+    <!-- AWS TRACK -->
+    <div class="pipeline-group">
+      <div class="pipeline-label" style="color:#ff6b35">AWS TRACK</div>
+      <div class="pipeline-stages">
+
+        <div class="stage" style="--stage-color:#ff6b35" onclick="toggleStage(this)">
+          <span class="stage-icon">🐍</span>
+          <div class="stage-name">Block 1</div>
+          <div class="stage-tech">GitHub + Python</div>
+          <div class="stage-detail">Create repo · ridewave_utils.py · .gitignore · commit</div>
+        </div>
+
+        <div class="arrow">→</div>
+
+        <div class="stage" style="--stage-color:#ff6b35" onclick="toggleStage(this)">
+          <span class="stage-icon">☁️</span>
+          <div class="stage-name">Block 2</div>
+          <div class="stage-tech">AWS S3 + IAM</div>
+          <div class="stage-detail">S3 bucket · folder structure · generate 5 CSVs · upload raw/ files</div>
+        </div>
+
+        <div class="arrow">→</div>
+
+        <div class="stage" style="--stage-color:#ff6b35" onclick="toggleStage(this)">
+          <span class="stage-icon">🔍</span>
+          <div class="stage-name">Block 3</div>
+          <div class="stage-tech">AWS Athena</div>
+          <div class="stage-detail">External tables · 3 standard queries · 3 advanced SQL (RANK, LAG, CTE)</div>
+        </div>
+
+        <div class="arrow">→</div>
+
+        <div class="stage" style="--stage-color:#ff6b35" onclick="toggleStage(this)">
+          <span class="stage-icon">⚙️</span>
+          <div class="stage-name">Block 4</div>
+          <div class="stage-tech">AWS Glue</div>
+          <div class="stage-detail">data_profiler.py · Glue Crawler · ETL job CSV→Parquet · 2nd crawler</div>
+        </div>
+
+        <div class="arrow">→</div>
+
+        <div class="stage" style="--stage-color:#ff6b35" onclick="toggleStage(this)">
+          <span class="stage-icon">⚡</span>
+          <div class="stage-name">Block 5</div>
+          <div class="stage-tech">Kinesis + Lambda</div>
+          <div class="stage-detail">KDS stream · Firehose → S3 · CloudShell producer · Lambda auto-producer</div>
+        </div>
+
+        <div class="arrow">→</div>
+
+        <div class="stage" style="--stage-color:#ff6b35" onclick="toggleStage(this)">
+          <span class="stage-icon">🏛️</span>
+          <div class="stage-name">Block 6</div>
+          <div class="stage-tech">AWS Redshift</div>
+          <div class="stage-detail">Serverless · CREATE tables · COPY from S3 · 6 SQL queries</div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="pipeline-divider"></div>
+
+    <!-- SHARED -->
+    <div class="pipeline-group">
+      <div class="pipeline-label" style="color:#64748b">SHARED</div>
+      <div class="pipeline-stages" style="justify-content:center">
+        <div class="stage" style="--stage-color:#64748b; min-width:200px" onclick="toggleStage(this)">
+          <span class="stage-icon">🪣</span>
+          <div class="stage-name">S3 is the Fork</div>
+          <div class="stage-tech">se-de-q1-26 / day8 / YOUR_NAME</div>
+          <div class="stage-detail">Both pipelines share S3. AWS track: raw/ → Glue → Redshift. Databricks track: raw/ → Auto Loader → Bronze → Silver → Gold</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pipeline-divider"></div>
+
+    <!-- DATABRICKS TRACK -->
+    <div class="pipeline-group">
+      <div class="pipeline-label" style="color:#00c2ff">DATABRICKS</div>
+      <div class="pipeline-stages">
+
+        <div class="stage" style="--stage-color:#f97316" onclick="toggleStage(this)">
+          <span class="stage-icon">🔶</span>
+          <div class="stage-name">Block 7 · Bronze</div>
+          <div class="stage-tech">Delta Lake · Append</div>
+          <div class="stage-detail">Cell 0: Recovery · Cell 1: Generate + upload CSVs · Cell 2: rides_bronze (300 rows) · Cell 3: Constraints · Cell 4: drivers_bronze (100 rows) · Cell 5: Schema enforcement DEMO — DELETE before Workflow · Cell 6: bronze_validator() · Cell 7: explain()</div>
+        </div>
+
+        <div class="arrow">→</div>
+
+        <div class="stage" style="--stage-color:#a3e635" onclick="toggleStage(this)">
+          <span class="stage-icon">🟢</span>
+          <div class="stage-name">Block 8 · Silver</div>
+          <div class="stage-tech">MERGE · CDF · Window</div>
+          <div class="stage-detail">Cell 0: Recovery · Cell 1: Read Bronze + 7 cleaning rules → rides_silver (~157 rows) · Cell 2: MERGE write · Cell 3: Prove idempotency · Cell 4: drivers_silver (100 rows) · Cell 5: Enable CDF · Cell 6: Window functions (SUM OVER, RANK) · Cell 7: Broadcast join explain()</div>
+        </div>
+
+        <div class="arrow">→</div>
+
+        <div class="stage" style="--stage-color:#fbbf24" onclick="toggleStage(this)">
+          <span class="stage-icon">🏆</span>
+          <div class="stage-name">Block 9 · Gold</div>
+          <div class="stage-tech">CTE · OPTIMIZE · Time Travel</div>
+          <div class="stage-detail">Cell 0: Recovery · Cell 1: Verify Silver · Cell 2: gold_city_revenue (6 rows) · Cell 3: gold_driver_performance (~30 rows) · Cell 4: gold_peak_hours · Cell 5: OPTIMIZE impact · Cell 6: Time Travel · Cell 7: Cohort analysis</div>
+        </div>
+
+        <div class="arrow">→</div>
+
+        <div class="stage" style="--stage-color:#00c2ff" onclick="toggleStage(this)">
+          <span class="stage-icon">🤖</span>
+          <div class="stage-name">Block 10 · Workflow</div>
+          <div class="stage-tech">Jobs · DAG · Schedule</div>
+          <div class="stage-detail">Enable Lambda trigger first · Push notebooks to Repos · Create 3-task job · Set task dependencies · Add retry policy · Run now → all GREEN · Set 6 AM schedule · PAUSE schedule · Disable Lambda trigger</div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- EXPECTED COUNTS -->
+  <div style="margin-top:32px; background:var(--card); border:1px solid var(--border); border-radius:12px; padding:24px;">
+    <div style="font-family:var(--mono); font-size:11px; letter-spacing:2px; color:var(--muted); margin-bottom:16px; text-transform:uppercase;">Expected Row Counts — Verify Before Demo</div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:12px;">
+      <div style="background:rgba(0,0,0,0.3); border-radius:8px; padding:12px; text-align:center;">
+        <div style="font-family:var(--mono); font-size:22px; font-weight:700; color:#f97316;">300</div>
+        <div style="font-size:12px; color:var(--muted); margin-top:4px;">rides_bronze</div>
+      </div>
+      <div style="background:rgba(0,0,0,0.3); border-radius:8px; padding:12px; text-align:center;">
+        <div style="font-family:var(--mono); font-size:22px; font-weight:700; color:#f97316;">100</div>
+        <div style="font-size:12px; color:var(--muted); margin-top:4px;">drivers_bronze</div>
+      </div>
+      <div style="background:rgba(0,0,0,0.3); border-radius:8px; padding:12px; text-align:center;">
+        <div style="font-family:var(--mono); font-size:22px; font-weight:700; color:#a3e635;">~157</div>
+        <div style="font-size:12px; color:var(--muted); margin-top:4px;">rides_silver</div>
+      </div>
+      <div style="background:rgba(0,0,0,0.3); border-radius:8px; padding:12px; text-align:center;">
+        <div style="font-family:var(--mono); font-size:22px; font-weight:700; color:#a3e635;">~100</div>
+        <div style="font-size:12px; color:var(--muted); margin-top:4px;">drivers_silver</div>
+      </div>
+      <div style="background:rgba(0,0,0,0.3); border-radius:8px; padding:12px; text-align:center;">
+        <div style="font-family:var(--mono); font-size:22px; font-weight:700; color:#fbbf24;">6</div>
+        <div style="font-size:12px; color:var(--muted); margin-top:4px;">gold_city_revenue</div>
+      </div>
+      <div style="background:rgba(0,0,0,0.3); border-radius:8px; padding:12px; text-align:center;">
+        <div style="font-family:var(--mono); font-size:22px; font-weight:700; color:#fbbf24;">~30</div>
+        <div style="font-size:12px; color:var(--muted); margin-top:4px;">gold_driver_perf</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════
+     SECTION 3 — WHAT BREAKS
+══════════════════════════════════════════ -->
+<div class="section" id="section-breaks">
+  <div class="sec-header">
+    <span class="sec-tag">For every SME question</span>
+    <div class="sec-title">What Breaks Without This Feature</div>
+    <div class="sec-sub">When an SME asks "why are you using this?" — this is your answer. Learn the break scenario, not just the feature name.</div>
+  </div>
+
+  <table class="breaks-table">
+    <thead>
+      <tr>
+        <th>Feature</th>
+        <th>What breaks without it</th>
+        <th>Your answer to SME</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <tr>
+        <td>
+          <span class="feature-name">mode('append')</span>
+          <span class="feature-layer">Bronze Layer</span>
+        </td>
+        <td>
+          <div class="break-text">Yesterday's data is deleted every run</div>
+          <div class="why-text">Finance asks "show last month's rides" → impossible. Regulatory audit needs historical data → company fined. No way to reprocess from source.</div>
+        </td>
+        <td><div class="sme-answer">"Bronze is our audit trail. Overwrite destroys history. Append means every run adds a new partition. We can always go back to any day's data — even from 2 years ago."</div></td>
+      </tr>
+
+      <tr>
+        <td>
+          <span class="feature-name">4 Metadata Columns</span>
+          <span class="feature-layer">Bronze Layer</span>
+        </td>
+        <td>
+          <div class="break-text">Cannot debug where bad data came from</div>
+          <div class="why-text">Gold shows wrong revenue. You check Silver → Bronze → but which file caused it? Which pipeline run? Without _source, _ingest_ts, _file_name, _run_id — you are blind.</div>
+        </td>
+        <td><div class="sme-answer">"These 4 columns are the audit trail inside each record. When data is wrong, I can trace it back to the exact source file, exact pipeline run, and exact time it was ingested."</div></td>
+      </tr>
+
+      <tr>
+        <td>
+          <span class="feature-name">MERGE (Silver)</span>
+          <span class="feature-layer">Silver Layer</span>
+        </td>
+        <td>
+          <div class="break-text">Pipeline crash → duplicates on restart</div>
+          <div class="why-text">Pipeline fails halfway, restarts. With overwrite → entire table rewritten. With INSERT → same records added twice. Silver has 2x the records. Gold shows 2x revenue. Wrong decisions made.</div>
+        </td>
+        <td><div class="sme-answer">"MERGE is idempotent. Run it once — 157 rows. Run it 10 times — still 157 rows. If the pipeline crashes and restarts, it is safe. No duplicates ever. This is the production standard."</div></td>
+      </tr>
+
+      <tr>
+        <td>
+          <span class="feature-name">Checkpoint</span>
+          <span class="feature-layer">Auto Loader</span>
+        </td>
+        <td>
+          <div class="break-text">Every run reprocesses all S3 files</div>
+          <div class="why-text">Day 1: 100 files processed → Bronze has 300 rows. Day 2: pipeline re-reads all 100 + 10 new = 110 files → Bronze has 630 rows. After 1 month → Bronze has 10x data. Gold shows 10x revenue.</div>
+        </td>
+        <td><div class="sme-answer">"Checkpoint is Auto Loader's memory. It writes processed file names to S3 after each run. Next run — skips already-processed files, reads only new ones. Exactly-once ingestion guaranteed."</div></td>
+      </tr>
+
+      <tr>
+        <td>
+          <span class="feature-name">Watermark</span>
+          <span class="feature-layer">Structured Streaming</span>
+        </td>
+        <td>
+          <div class="break-text">Spark holds ALL window states in memory → cluster crash</div>
+          <div class="why-text">Without watermark, Spark never cleans up old window state. After 24 hours of streaming with 5-minute windows → 288 windows × thousands of drivers → memory exhausted → cluster crashes → no data.</div>
+        </td>
+        <td><div class="sme-answer">"Watermark tells Spark: wait max 10 minutes for late data, then close the window and free that memory. Without it, memory grows forever. With it, Spark can run for months without crashing."</div></td>
+      </tr>
+
+      <tr>
+        <td>
+          <span class="feature-name">OPTIMIZE + ZORDER</span>
+          <span class="feature-layer">Gold Layer</span>
+        </td>
+        <td>
+          <div class="break-text">Thousands of small files → 45-minute dashboard load</div>
+          <div class="why-text">3 months of streaming = 50,000 micro-batch files. Spark opens each file separately = 50,000 operations. Simple Gold query takes 45 minutes. Dashboard is unusable. Business stops trusting data.</div>
+        </td>
+        <td><div class="sme-answer">"OPTIMIZE compacts 50,000 files into 5 files. ZORDER BY (city) clusters city data together so city-based queries scan less. Same query goes from 45 minutes to 2 minutes."</div></td>
+      </tr>
+
+      <tr>
+        <td>
+          <span class="feature-name">Time Travel</span>
+          <span class="feature-layer">Delta Lake</span>
+        </td>
+        <td>
+          <div class="break-text">Bad pipeline run → correct data lost forever</div>
+          <div class="why-text">A bug writes wrong revenue to Gold. Dashboard shows Mumbai revenue as ₹0. Without time travel — original correct data is overwritten. To fix, you must rerun the entire pipeline. Hours of downtime.</div>
+        </td>
+        <td><div class="sme-answer">"Every Delta write creates a version. RESTORE TABLE gold_city_revenue VERSION AS OF 3 rolls back in seconds. No pipeline rerun needed. This is why Delta is production-safe — data is never truly lost."</div></td>
+      </tr>
+
+      <tr>
+        <td>
+          <span class="feature-name">Workflow DAG</span>
+          <span class="feature-layer">Orchestration</span>
+        </td>
+        <td>
+          <div class="break-text">Pipeline runs on bad data → wrong Gold output</div>
+          <div class="why-text">Without dependencies: Bronze fails but Silver still runs on empty table. Gold aggregates nothing. Dashboard shows ₹0 revenue. Looks like business collapsed. CEO panics. Without DAG — cascading failures.</div>
+        </td>
+        <td><div class="sme-answer">"The DAG dependency means: Silver only runs if Bronze succeeded. Gold only runs if Silver succeeded. One failure stops the cascade. One alert email. No wrong data reaches the dashboard."</div></td>
+      </tr>
+
+      <tr>
+        <td>
+          <span class="feature-name">Unity Catalog</span>
+          <span class="feature-layer">Governance</span>
+        </td>
+        <td>
+          <div class="break-text">Intern sees all customer credit card numbers → GDPR breach</div>
+          <div class="why-text">Without Unity Catalog — every Databricks user can query every table. One SQL query exposes all customer PII. In India: DPDP Act violation. In Europe: GDPR fine. Company reputation destroyed.</div>
+        </td>
+        <td><div class="sme-answer">"Unity Catalog controls who sees what at the column level. Analysts see masked credit card (****-1001). Finance sees full number. One policy covers notebooks, SQL, dashboards, and ML — all tools at once."</div></td>
+      </tr>
+
+      <tr>
+        <td>
+          <span class="feature-name">CTE Syntax (Gold)</span>
+          <span class="feature-layer">Gold Layer</span>
+        </td>
+        <td>
+          <div class="break-text">New engineer cannot understand or maintain the query</div>
+          <div class="why-text">A 50-line nested subquery with no names is impossible to debug at 3 AM when the Gold table is wrong. Without CTEs — the query is a black box. With CTEs — each step has a name and purpose.</div>
+        </td>
+        <td><div class="sme-answer">"CTEs give each transformation step a meaningful name. cleaned_rides → city_summary → final result. Anyone can read it top to bottom and understand what it does. Maintenance-friendly code is production-ready code."</div></td>
+      </tr>
+
+    </tbody>
+  </table>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SECTION 4 — KEY COMMANDS
+══════════════════════════════════════════ -->
+<div class="section" id="section-commands">
+  <div class="sec-header">
+    <span class="sec-tag">The 10 that matter most</span>
+    <div class="sec-title">Key Commands — RideWave Edition</div>
+    <div class="sec-sub">Not all 78 features. Just the 10 you will use in every interview, every mini project, and every job. Learn these deeply.</div>
+  </div>
+
+  <div class="commands-grid">
+
+    <div class="cmd-card">
+      <div class="cmd-header">
+        <div class="cmd-num">1</div>
+        <div class="cmd-title">Bronze Ingestion — Append + Metadata</div>
+        <div class="cmd-layer">Block 7</div>
+      </div>
+      <div class="cmd-body">
+        <div class="cmd-why">Raw rides data → Bronze Delta table. Append-only preserves history. 4 metadata columns = audit trail. Partition by date = fast date queries.</div>
+        <pre class="cmd-code"><span class="comment"># Add 4 mandatory Bronze metadata columns</span>
+df_bronze = df_raw
+  .withColumn(<span class="str">"_source"</span>,    F.lit(<span class="str">"s3_raw_rides"</span>))
+  .withColumn(<span class="str">"_ingest_ts"</span>,  F.current_timestamp())
+  .withColumn(<span class="str">"_file_name"</span>,  F.lit(S3_PATH))
+  .withColumn(<span class="str">"_run_id"</span>,     F.lit(RUN_ID))
+  .withColumn(<span class="str">"ingest_date"</span>, F.current_date())
+
+df_bronze.write.format(<span class="str">"delta"</span>)
+  .mode(<span class="str">"append"</span>)            <span class="comment"># NEVER overwrite</span>
+  .partitionBy(<span class="str">"ingest_date"</span>) <span class="comment"># one folder per day</span>
+  .saveAsTable(f<span class="str">"{YOUR_DB}.rides_bronze"</span>)</pre>
+        <div class="cmd-remember">⚡ Never use mode('overwrite') on Bronze. Ever. If your trainer sees it — red flag.</div>
+      </div>
+    </div>
+
+    <div class="cmd-card">
+      <div class="cmd-header">
+        <div class="cmd-num">2</div>
+        <div class="cmd-title">Silver Cleaning — 7 Rules</div>
+        <div class="cmd-layer">Block 8</div>
+      </div>
+      <div class="cmd-body">
+        <div class="cmd-why">Bronze has nulls, wrong types, mixed case. Silver applies business rules. Only completed rides. Proper types for calculations. Clean text for consistent joins.</div>
+        <pre class="cmd-code">df_silver = df_bronze
+  .filter(F.col(<span class="str">"ride_id"</span>).isNotNull())       <span class="comment"># Rule 1</span>
+  .filter(F.col(<span class="str">"fare_amount"</span>).isNotNull())   <span class="comment"># Rule 2</span>
+  .filter(F.col(<span class="str">"ride_status"</span>) == <span class="str">"completed"</span>) <span class="comment"># Rule 3</span>
+  .withColumn(<span class="str">"ride_date"</span>,
+    F.to_date(<span class="str">"ride_date"</span>, <span class="str">"yyyy-MM-dd"</span>))    <span class="comment"># Rule 4</span>
+  .withColumn(<span class="str">"fare_amount"</span>,
+    F.col(<span class="str">"fare_amount"</span>).cast(<span class="str">"double"</span>))      <span class="comment"># Rule 5</span>
+  .withColumn(<span class="str">"ride_status"</span>,
+    F.lower(F.col(<span class="str">"ride_status"</span>)))           <span class="comment"># Rule 6</span>
+  .withColumn(<span class="str">"processing_date"</span>,
+    F.current_date())                           <span class="comment"># Rule 7</span></pre>
+        <div class="cmd-remember">⚡ Bronze: 300 rows. Silver: ~157 rows. Dropped 143 = nulls + non-completed. Know this number.</div>
+      </div>
+    </div>
+
+    <div class="cmd-card">
+      <div class="cmd-header">
+        <div class="cmd-num">3</div>
+        <div class="cmd-title">MERGE — Idempotent Silver Write</div>
+        <div class="cmd-layer">Block 8</div>
+      </div>
+      <div class="cmd-body">
+        <div class="cmd-why">Run once = 157 rows. Run 10 times = still 157 rows. MERGE checks ride_id: exists → update, new → insert. Pipeline crash + restart = safe. No duplicates ever.</div>
+        <pre class="cmd-code"><span class="kw">from</span> delta.tables <span class="kw">import</span> DeltaTable
+
+<span class="kw">if not</span> spark.catalog.tableExists(f<span class="str">"{YOUR_DB}.rides_silver"</span>):
+    df_silver.write.format(<span class="str">"delta"</span>).mode(<span class="str">"overwrite"</span>)
+      .saveAsTable(f<span class="str">"{YOUR_DB}.rides_silver"</span>)
+<span class="kw">else</span>:
+    target = DeltaTable.forName(spark, f<span class="str">"{YOUR_DB}.rides_silver"</span>)
+    (target.alias(<span class="str">"tgt"</span>)
+      .merge(df_silver.alias(<span class="str">"src"</span>),
+             <span class="str">"tgt.ride_id = src.ride_id"</span>)  <span class="comment"># match key</span>
+      .whenMatchedUpdateAll()                <span class="comment"># SCD Type 1</span>
+      .whenNotMatchedInsertAll()             <span class="comment"># insert new</span>
+      .execute()
+    )</pre>
+        <div class="cmd-remember">⚡ MERGE = SCD Type 1. whenMatchedUpdateAll replaces old with new. No history kept on matched rows.</div>
+      </div>
+    </div>
+
+    <div class="cmd-card">
+      <div class="cmd-header">
+        <div class="cmd-num">4</div>
+        <div class="cmd-title">Gold CTE — City Revenue</div>
+        <div class="cmd-layer">Block 9</div>
+      </div>
+      <div class="cmd-body">
+        <div class="cmd-why">Always read Gold from Silver — never Bronze. CTEs make the query readable. Each step has a name. New engineer can understand in 2 minutes. Production-ready code.</div>
+        <pre class="cmd-code">spark.sql(f<span class="str">"""
+WITH cleaned_rides AS (
+    SELECT * FROM {YOUR_DB}.rides_silver
+    WHERE fare_amount IS NOT NULL
+      AND ride_status = 'completed'
+),
+city_summary AS (
+    SELECT city,
+           COUNT(*)                   AS total_rides,
+           ROUND(SUM(fare_amount), 2) AS total_revenue,
+           ROUND(AVG(fare_amount), 2) AS avg_fare
+    FROM cleaned_rides
+    GROUP BY city
+)
+SELECT * FROM city_summary
+ORDER BY total_revenue DESC
+"""</span>).write.format(<span class="str">"delta"</span>).mode(<span class="str">"overwrite"</span>)
+  .saveAsTable(f<span class="str">"{YOUR_GOLD_DB}.gold_city_revenue"</span>)</pre>
+        <div class="cmd-remember">⚡ Gold uses overwrite (not MERGE) because it is fully recalculated every run from Silver. Aggregations are not incremental.</div>
+      </div>
+    </div>
+
+    <div class="cmd-card">
+      <div class="cmd-header">
+        <div class="cmd-num">5</div>
+        <div class="cmd-title">OPTIMIZE + ZORDER</div>
+        <div class="cmd-layer">Block 9</div>
+      </div>
+      <div class="cmd-body">
+        <div class="cmd-why">After many writes, Delta has thousands of small files. Spark opens each separately = slow. OPTIMIZE compacts them. ZORDER clusters by city so city queries skip irrelevant files.</div>
+        <pre class="cmd-code"><span class="comment"># Run after every Gold table creation</span>
+spark.sql(f<span class="str">"""
+    OPTIMIZE {YOUR_GOLD_DB}.gold_city_revenue
+    ZORDER BY (city)
+"""</span>)
+
+<span class="comment"># Measure the impact</span>
+before = spark.sql(
+  f<span class="str">"DESCRIBE DETAIL {YOUR_GOLD_DB}.gold_city_revenue"</span>
+).select(<span class="str">"numFiles"</span>, <span class="str">"sizeInBytes"</span>).first()
+print(f<span class="str">"Files: {before['numFiles']}"</span>)</pre>
+        <div class="cmd-remember">⚡ OPTIMIZE = fewer files = faster queries. ZORDER = data clustering = skip irrelevant files. Both together = maximum query speed.</div>
+      </div>
+    </div>
+
+    <div class="cmd-card">
+      <div class="cmd-header">
+        <div class="cmd-num">6</div>
+        <div class="cmd-title">Time Travel</div>
+        <div class="cmd-layer">Block 9</div>
+      </div>
+      <div class="cmd-body">
+        <div class="cmd-why">Every Delta write creates a version automatically. Query any past version. Restore if a bad pipeline run corrupts data. No data is ever truly lost in Delta Lake.</div>
+        <pre class="cmd-code"><span class="comment"># See all versions</span>
+spark.sql(f<span class="str">"""
+    DESCRIBE HISTORY {YOUR_GOLD_DB}.gold_city_revenue
+"""</span>).display()
+
+<span class="comment"># Query version 0 (first write)</span>
+spark.sql(f<span class="str">"""
+    SELECT * FROM {YOUR_GOLD_DB}.gold_city_revenue
+    VERSION AS OF 0
+"""</span>).display()
+
+<span class="comment"># Restore to a good version if pipeline went wrong</span>
+<span class="comment"># RESTORE TABLE gold_city_revenue VERSION AS OF 3</span></pre>
+        <div class="cmd-remember">⚡ Time Travel is Delta's superpower. Parquet has no versions. Delta remembers every write. This is why companies migrate from Parquet to Delta.</div>
+      </div>
+    </div>
+
+    <div class="cmd-card">
+      <div class="cmd-header">
+        <div class="cmd-num">7</div>
+        <div class="cmd-title">RANK() Window Function</div>
+        <div class="cmd-layer">Block 8 + 9</div>
+      </div>
+      <div class="cmd-body">
+        <div class="cmd-why">RANK() assigns position within a group. "Who is the #1 driver in Mumbai?" without RANK requires a self-join. With RANK = one clean query. PARTITION BY resets rank per group.</div>
+        <pre class="cmd-code">spark.sql(f<span class="str">"""
+WITH driver_counts AS (
+    SELECT driver_id, city, COUNT(*) AS ride_count
+    FROM {YOUR_DB}.rides_silver
+    GROUP BY driver_id, city
+),
+ranked AS (
+    SELECT *,
+        RANK() OVER (
+            PARTITION BY city        -- reset rank per city
+            ORDER BY ride_count DESC -- highest first
+        ) AS city_rank
+    FROM driver_counts
+)
+SELECT * FROM ranked
+WHERE city_rank <= 3   -- top 3 per city
+"""</span>).display()</pre>
+        <div class="cmd-remember">⚡ RANK vs ROW_NUMBER: RANK gives same rank to ties (1,1,3). ROW_NUMBER always unique (1,2,3). DENSE_RANK no gaps (1,1,2).</div>
+      </div>
+    </div>
+
+    <div class="cmd-card">
+      <div class="cmd-header">
+        <div class="cmd-num">8</div>
+        <div class="cmd-title">Broadcast Join</div>
+        <div class="cmd-layer">Block 8</div>
+      </div>
+      <div class="cmd-body">
+        <div class="cmd-why">Joining rides (big) with drivers (small, 100 rows). Normal join = shuffle rides across network = slow. Broadcast = copy drivers to ALL executors = local join = fast. No network shuffle needed.</div>
+        <pre class="cmd-code"><span class="kw">from</span> pyspark.sql.functions <span class="kw">import</span> broadcast
+
+df_rides   = spark.table(f<span class="str">"{YOUR_DB}.rides_silver"</span>)
+df_drivers = spark.table(f<span class="str">"{YOUR_DB}.drivers_silver"</span>)
+
+<span class="comment"># Broadcast the SMALL table (100 rows)</span>
+result = df_rides.join(
+    broadcast(df_drivers),  <span class="comment"># sent to all executors</span>
+    <span class="str">"driver_id"</span>,
+    <span class="str">"left"</span>
+)
+
+result.explain(True)  <span class="comment"># look for BroadcastHashJoin</span></pre>
+        <div class="cmd-remember">⚡ Rule: broadcast tables under 10MB. Never broadcast large tables — OOM error. drivers (100 rows) = safe. rides (millions) = never.</div>
+      </div>
+    </div>
+
+    <div class="cmd-card">
+      <div class="cmd-header">
+        <div class="cmd-num">9</div>
+        <div class="cmd-title">Bronze Validator Function</div>
+        <div class="cmd-layer">Block 7</div>
+      </div>
+      <div class="cmd-body">
+        <div class="cmd-why">Before Silver runs, validate Bronze meets 4 quality standards. Catch issues early — better than discovering bad data in Gold when SME is watching your demo.</div>
+        <pre class="cmd-code"><span class="kw">def</span> <span class="fn">bronze_validator</span>(df, table_name, key_col, cols):
+    row_count  = df.count()
+    null_count = df.filter(F.col(key_col).isNull()).count()
+    null_pct   = null_count / row_count * 100
+    missing    = [c <span class="kw">for</span> c <span class="kw">in</span> cols <span class="kw">if</span> c <span class="kw">not in</span> df.columns]
+    meta_cols  = [<span class="str">"_source"</span>,<span class="str">"_ingest_ts"</span>,<span class="str">"_file_name"</span>,<span class="str">"_run_id"</span>]
+    meta_miss  = [c <span class="kw">for</span> c <span class="kw">in</span> meta_cols <span class="kw">if</span> c <span class="kw">not in</span> df.columns]
+
+    print(f<span class="str">"  rows    : {row_count}"</span>)
+    print(f<span class="str">"  nulls   : {null_count} ({null_pct:.1f}%)"</span>)
+    print(f<span class="str">"  missing : {missing}"</span>)
+    print(f<span class="str">"  metadata: {meta_miss}"</span>)
+
+    <span class="kw">return</span> {
+        <span class="str">"row_count"</span>: <span class="str">"pass"</span> <span class="kw">if</span> row_count > 0 <span class="kw">else</span> <span class="str">"fail"</span>,
+        <span class="str">"null_pct"</span> : <span class="str">"pass"</span> <span class="kw">if</span> null_pct < 5 <span class="kw">else</span> <span class="str">"fail"</span>,
+        <span class="str">"schema"</span>   : <span class="str">"pass"</span> <span class="kw">if not</span> missing <span class="kw">else</span> <span class="str">"fail"</span>,
+        <span class="str">"metadata"</span> : <span class="str">"pass"</span> <span class="kw">if not</span> meta_miss <span class="kw">else</span> <span class="str">"fail"</span>
+    }</pre>
+        <div class="cmd-remember">⚡ In production — assert on validator results. If row_count == 'fail', raise Exception and stop the pipeline before bad data reaches Silver.</div>
+      </div>
+    </div>
+
+    <div class="cmd-card">
+      <div class="cmd-header">
+        <div class="cmd-num">10</div>
+        <div class="cmd-title">Recovery Cell — Every Notebook</div>
+        <div class="cmd-layer">All Blocks</div>
+      </div>
+      <div class="cmd-body">
+        <div class="cmd-why">Every notebook session is isolated. Cluster restart, compute switch, or opening a new notebook — all variables are gone. Recovery Cell makes each notebook self-contained and Workflow-ready.</div>
+        <pre class="cmd-code"><span class="comment"># ── RECOVERY CELL — Run FIRST every session ──────────</span>
+YOUR_NAME   = <span class="str">"yourname"</span>    <span class="comment"># ← CHANGE THIS</span>
+
+<span class="kw">if</span> YOUR_NAME == <span class="str">"yourname"</span>:
+    <span class="kw">raise</span> Exception(<span class="str">"Change YOUR_NAME first!"</span>)
+
+CATALOG     = <span class="str">"de_workspace26"</span>
+YOUR_DB     = f<span class="str">"{CATALOG}.ridewave_{YOUR_NAME}"</span>
+S3_PATH     = f<span class="str">"s3://se-de-q1-26/day8/{YOUR_NAME}/"</span>
+CKPT_BRONZE = f<span class="str">"{S3_PATH}checkpoints/bronze/"</span>
+CKPT_SILVER = f<span class="str">"{S3_PATH}checkpoints/silver/"</span>
+CKPT_GOLD   = f<span class="str">"{S3_PATH}checkpoints/gold/"</span>
+
+spark.sql(f<span class="str">"USE CATALOG {CATALOG}"</span>)
+spark.sql(f<span class="str">"CREATE SCHEMA IF NOT EXISTS ridewave_{YOUR_NAME}"</span>)
+print(f<span class="str">"✅ Ready — {YOUR_NAME} — {YOUR_DB}"</span>)</pre>
+        <div class="cmd-remember">⚡ Variables do NOT travel between notebooks. Bronze notebook variables are gone when Silver opens. That is why EVERY notebook has its own Recovery Cell.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</div><!-- end wrapper -->
+
+<script>
+// ── TAB NAVIGATION ──
+function showSection(id, tab) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('section-' + id).classList.add('active');
+  tab.classList.add('active');
+}
+
+// ── PIPELINE STAGE TOGGLE ──
+function toggleStage(el) {
+  el.classList.toggle('expanded');
+  if (el.classList.contains('done') && !el.classList.contains('expanded')) {
+    return;
+  }
+  el.classList.toggle('done');
+  updateProgress();
+}
+
+function updateProgress() {
+  const stages  = document.querySelectorAll('.stage');
+  const done    = document.querySelectorAll('.stage.done');
+  const pct     = Math.round(done.length / stages.length * 100);
+  document.getElementById('progressBar').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent =
+    done.length + ' of ' + stages.length + ' stages complete — ' + pct + '%';
+}
+
+function resetAll() {
+  document.querySelectorAll('.stage').forEach(s => {
+    s.classList.remove('done', 'expanded');
+  });
+  updateProgress();
+}
+
+function markAll() {
+  document.querySelectorAll('.stage').forEach(s => {
+    s.classList.add('done');
+    s.classList.remove('expanded');
+  });
+  updateProgress();
+}
+</script>
+</body>
+</html>
